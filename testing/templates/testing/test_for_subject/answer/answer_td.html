@@ -1,0 +1,17 @@
+<tr>
+    <td style="width: 70%;"><input type="text" class="form-control-sm form-control-s answer_text_input" value="{{ answer.answer }}" required></td>
+    <td class="is_true_td">
+        <div class="form-check">
+            <input class="form-check-input is_true_input"
+                    {% if question.has_multiple_choice %}
+                   type="checkbox"
+                    {% else %}
+                   type="radio" required
+                    {% endif %}
+                   {% if answer.is_true %}checked{% endif %}>
+            <label class="form-check-label" for="flexCheckDefault">Является правильным ответом</label>
+            <div class="invalid-feedback">Выберите хотя бы один правильный ответ!</div>
+        </div>
+    </td>
+    <td><i class="fas fa-times delete_answer_button"></i></td>
+</tr>

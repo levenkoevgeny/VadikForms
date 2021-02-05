@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css %}{% endblock %}
+{% block title %}Новый предмет{% endblock %}
+{% block content %}
+    <div class="container">
+        <br>
+        <form action="{% url 'testing:subject_add' %}" method="POST" class="needs-validation" id="subject_form" novalidate>{% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Название предмета</label>
+                {% render_field form.subject_name class+="form-control" %}
+            </div>
+{#            <div class="mb-3">#}
+{#                <label class="form-label">Кафедра</label>#}
+{#                {% render_field form.subdivision class+="form-control" %}#}
+{#            </div>#}
+            <button type="submit" class="btn btn-primary" id="subject_add">Создать</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'testing/js/subject_ajax_add.js' %}"></script>
+{% endblock %}

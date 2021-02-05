@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load url_replace %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'testing/css/main.css' %}">
+{% endblock %}
+{% block title %}Результаты тестирования{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="shadow-lg p-3 mb-5 bg-white rounded">
+            <form action="{% url 'training:test_all_results' %}" method="get">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">ФИО</label>
+                            {% render_field filter.form.learner_fio class+="form-control"  %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label">Предмет</label>
+                            {% render_field filter.form.subject class+="form-control select2" style="width: 100%;" %}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label">Название теста</label>
+                            {% render_field filter.form.test class+="form-control select2" style="width: 100%;" %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label">Дата прохождения теста (с)</label>
+                            {% render_field filter.form.test_date_start class+="form-control"  %}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label">Дата прохождения теста (по)</label>
+                            {% render_field filter.form.test_date_end class+="form-control"  %}
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Поиск</button> <a href="{% url 'training:test_all_results' %}" class="btn btn-primary">Сбросить фильтр</a>
+            </form>
+        </div>
+    </div>
+    <div class="container-fluid">
+        {% if results %}
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Кафедра</th>
+                    <th scope="col">Предмет</th>
+                    <th scope="col">Название теста</th>
+                    <th scope="col">Фамилия обучающегося</th>
+                    <th scope="col">Дата  время проведения теста</th>
+                    <th scope="col">Результат тестирования</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result.test.subject.subdivision }}</td>
+                        <td>{{ result.test.subject }}</td>
+                        <td>{{ result.test.test_name }}</td>
+                        <td>{{ result.learner_fio }}</td>
+                        <td>{{ result.test_date }}</td>
+                        <td>{{ result.score }}</td>
+                        <td><a href="{% url 'training:test_result' result.test.subject.id result.test.id result.id %}" class="btn btn-success">Посмотреть решение</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <nav aria-label="...">
+                <ul class="pagination pagination-sm">
+                    {% if results.has_previous %}
+                        <li class="page-item">
+                            <a class="btn btn-outline-dark" href="?{% url_replace request 'page' results.previous_page_number %}"><span aria-hidden="true">&laquo;</span></a>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="btn btn-outline-dark disabled" href="#"><span aria-hidden="true">&laquo;</span></a>
+                        </li>
+                    {% endif %}
+                    <li class="page-item d-flex align-items-center disabled"><b>&nbsp;&nbsp;Страница {{ results.number }} из {{ results.paginator.num_pages }}&nbsp;&nbsp;</b></li>
+                    {% if results.has_next %}
+                        <li class="page-item">
+                            <a class="btn btn-outline-dark" href="?{% url_replace request 'page' results.next_page_number %}"><span aria-hidden="true">&raquo;</span></a>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="btn btn-outline-dark disabled" href="#"><span aria-hidden="true">&raquo;</span></a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% else %}
+            <div style="width: 100%;">
+                <div class="card-body">
+                    <h5 class="card-title">Список пуст</h5>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+{% block js %}{% endblock %}

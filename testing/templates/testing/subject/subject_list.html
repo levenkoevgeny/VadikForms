@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load url_replace %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'testing/css/main.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+{% block title %}Мои предметы{% endblock %}
+{% block content %}
+    <div class="container">
+
+        <br>
+        <div class="shadow-lg p-3 mb-5 bg-white rounded">
+            <form action="{% url 'testing:subject_list' %}" method="get">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label">Название предмета</label>
+                            {% render_field filter.form.subject_name class+="form-control"  %}
+                        </div>
+                    </div>
+                    {% if request.user.is_superuser %}
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label class="form-label">Кафедра</label>
+                                {% render_field filter.form.subdivision class+="form-control select2" style="width: 100%;" %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary">Поиск</button> <a href="{% url 'testing:subject_list' %}" class="btn btn-primary">Сбросить фильтр</a>
+            </form>
+        </div>
+        <div class="d-flex justify-content-end">
+            <a class="btn btn-light" onclick="window.open('{% url 'testing:subject_add' %}','popup','width=700,height=300'); return false;"><i class="fas fa-plus-circle"></i> Добавить новый предмет</a>
+        </div><br>
+        {% if subject_list %}
+            <table class="table table-borderless table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Название предмета</th>
+                    <th scope="col">Кафедра</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for subject in subject_list %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'testing:test_list' subject.id %}" style="text-decoration: none;">{{ subject.subject_name|default_if_none:"Нет данных" }}</a>
+                            {#                        <button type="button" onclick="window.open('{% url 'testing:subject_update' subject.id %}','popup','width=700,height=400'); return false;" style="text-decoration: none;" class="btn btn-link">{{ subject.subject_name|default_if_none:"Нет данных" }}</button>#}
+                            {#                        <a onclick="window.open('{% url 'testing:subject_update' subject.id %}','popup','width=700,height=400'); return false;" style="text-decoration: none;">{{ subject.subject_name|default_if_none:"Нет данных" }}</a>#}
+                        </td>
+                        <td>{{ subject.subdivision.subdivision_name|default_if_none:"Нет данных" }}</td>
+                        <td><button type="button" onclick="window.open('{% url 'testing:subject_update' subject.id %}','popup','width=700,height=400'); return false;" style="text-decoration: none;" class="btn btn-light">
+                            <i class="far fa-edit"></i></button>
+                        </td>
+                        <td><a href="{% url 'testing:subject_delete' subject.id %}" class="btn btn-light"><i class="far fa-trash-alt"></i></a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <nav aria-label="...">
+                <ul class="pagination pagination-sm">
+                    {% if subject_list.has_previous %}
+                        <li class="page-item">
+                            <a class="btn btn-outline-dark" href="?{% url_replace request 'page' subject_list.previous_page_number %}"><span aria-hidden="true">&laquo;</span></a>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="btn btn-outline-dark disabled" href="#"><span aria-hidden="true">&laquo;</span></a>
+                        </li>
+                    {% endif %}
+                    <li class="page-item d-flex align-items-center disabled"><b>&nbsp;&nbsp;Страница {{ subject_list.number }} из {{ subject_list.paginator.num_pages }}&nbsp;&nbsp;</b></li>
+                    {% if subject_list.has_next %}
+                        <li class="page-item">
+                            <a class="btn btn-outline-dark" href="?{% url_replace request 'page' subject_list.next_page_number %}"><span aria-hidden="true">&raquo;</span></a>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="btn btn-outline-dark disabled" href="#"><span aria-hidden="true">&raquo;</span></a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+
+        {% else %}
+            <div style="width: 100%;">
+                <div class="card-body">
+                    <h5 class="card-title">Список пуст</h5>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block js %}{% endblock %}

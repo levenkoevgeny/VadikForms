@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'testing/css/main.css' %}">
+{% endblock %}
+{% block title %}Тест для прохождения{% endblock %}
+{% block content %}
+
+    <div class="container">
+        <br>
+        {% if test_list %}
+            <table class="table table-borderless table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Название теста</th>
+                    <th scope="col">Описание теста</th>
+                    <th scope="col">Дата и время создания теста</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for test in test_list %}
+                    <tr>
+                        <td>{{ test.test_name|default_if_none:"Нет данных" }}</td>
+                        <td>{{ test.description|default_if_none:"Нет данных" }}</td>
+                        <td><i class="far fa-calendar-alt"></i> {{ test.date_added.date|default_if_none:"Нет данных" }} <i class="far fa-clock"></i> {{ test.date_added.time|default_if_none:"Нет данных" }}</td>
+                        <td><a href="{% url 'training:test_passing' test.subject.id test.id %}" class="btn btn-primary">Пройти тест</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="card" style="width: 100%;">
+                <div class="card-body">
+                    <h5 class="card-title">По данному предмету нет тестов для прохождения</h5>
+                    <a href="{% url 'training:subject_list' %}" class="card-link">Вернуться к списку предметов</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block js %}{% endblock %}

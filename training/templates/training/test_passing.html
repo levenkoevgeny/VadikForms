@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'testing/css/main.css' %}">
+{% endblock %}
+{% block title %}Прохождение теста{% endblock %}
+{% block content %}
+    <div class="container">
+        <br>
+        <form action="{% url 'training:test_passing' subject_id=test.subject.id test_id=test.id %}" class="needs-validation" method="POST" novalidate>{% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">ФИО</label>
+                    <input type="text" class="form-control" name="fio" placeholder="Введите фимилию имя и отчетство" required>
+                </div>
+            </div><br>
+            {% for question in test.question_set.all %}
+                <div class="card" style="width: 100%;">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-12 question_text_input_div">
+                                {{ question.question }}<br>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="answers_div">
+
+                            {% for answer in question.answer_set.all %}
+                                {% if question.has_multiple_choice %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="question_{{ question.id }}_checkbox_{{ forloop.counter0 }}" value="{{ answer.id }}">
+                                        <label class="form-check-label">
+                                            {{ answer.answer }}
+                                        </label>
+                                    </div>
+                                {% else %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="question_{{ question.id }}_radio" value="{{ answer.id }}" required>
+                                        <label class="form-check-label">
+                                            {{ answer.answer }}
+                                        </label>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+
+
+                        </div>
+                    </div>
+                </div><br>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Завершить тест</button>
+        </form>
+
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        (function () {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+{% endblock %}

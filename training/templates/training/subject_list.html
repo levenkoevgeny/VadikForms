@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load url_replace %}
+
+{% block css %}{% endblock %}
+{% block title %}Предметы для тестирования{% endblock %}
+{% block content %}
+    <div class="container">
+
+        <br>
+        <div class="shadow-lg p-3 mb-5 bg-white rounded">
+            <form action="{% url 'training:subject_list' %}" method="get">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label">Название предмета</label>
+                            {% render_field filter.form.subject_name class+="form-control"  %}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <label class="form-label">Кафедра</label>
+                            {% render_field filter.form.subdivision class+="form-control select2" style="width: 100%;" %}
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Поиск</button> <a href="{% url 'training:subject_list' %}" class="btn btn-primary">Сбросить фильтр</a>
+            </form>
+        </div><br>
+        {% if subject_list %}
+            <table class="table table-borderless table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Название предмета</th>
+                    <th scope="col">Кафедра</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for subject in subject_list %}
+                    <tr>
+                        <td><a href="{% url 'training:test_list' subject.id %}" style="text-decoration: none;">{{ subject.subject_name|default_if_none:"Нет данных" }}</a></td>
+                        <td>{{ subject.subdivision.subdivision_name|default_if_none:"Нет данных" }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <nav aria-label="...">
+                <ul class="pagination pagination-sm">
+                    {% if subject_list.has_previous %}
+                        <li class="page-item">
+                            <a class="btn btn-outline-dark" href="?{% url_replace request 'page' subject_list.previous_page_number %}"><span aria-hidden="true">&laquo;</span></a>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="btn btn-outline-dark disabled" href="#"><span aria-hidden="true">&laquo;</span></a>
+                        </li>
+                    {% endif %}
+                    <li class="page-item d-flex align-items-center disabled"><b>&nbsp;&nbsp;Страница {{ subject_list.number }} из {{ subject_list.paginator.num_pages }}&nbsp;&nbsp;</b></li>
+                    {% if subject_list.has_next %}
+                        <li class="page-item">
+                            <a class="btn btn-outline-dark" href="?{% url_replace request 'page' subject_list.next_page_number %}"><span aria-hidden="true">&raquo;</span></a>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="btn btn-outline-dark disabled" href="#"><span aria-hidden="true">&raquo;</span></a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% else %}
+            <div style="width: 100%;">
+                <div class="card-body">
+                    <h5 class="card-title">Список пуст</h5>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block js %}{% endblock %}

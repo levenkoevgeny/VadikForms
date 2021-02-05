@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'testing/css/main.css' %}">
+{% endblock %}
+{% block title %}Редактирование теста{% endblock %}
+{% block content %}
+
+    <div class="container" id="container"><br>
+        {#        <div class="position-fixed top-50 start-0 translate-middle m-5">#}
+        {#            <a class="nav-link add_question" href="#"><i class="fas fa-plus-square"></i></a>#}
+        {#        </div>#}
+
+        <form action="{% url 'testing:test_update' subject_id=subject.id test_id=test_obj.id %}" class="needs-validation" method="POST" novalidate>{% csrf_token %}
+
+            {#        Заголовок теста и описание#}
+            <h5>{{ subject.subject_name }}</h5>
+            <h6 id="id_question_count">Количество вопросов - {{ test_obj.question_set.all.count }}</h6>
+            <div class="card shadow bg-white rounded" style="width: 100%;">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <input type="text" class="form-control-s" value="{{ test_obj.test_name }}" id="id_test_name" name="test_name" style="font-size: 25px;" required>
+                    </h5><br>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        <input type="text" class="form-control-s d-inline-flex" value="{{ test_obj.description|default_if_none:"Нет описания" }}" id="id_test_description" name="test_description" style="font-size: 20px; color: #6c757d!important;">
+                        <small style="padding: 0.375rem 0.75rem;">Описание теста</small>
+                    </h6>
+                </div>
+            </div>
+            <br>
+
+            {#Меню для работы с вопросами#}
+            <div>
+                <nav class="navbar navbar-expand-sm navbar-light bg-light">
+                    <div class="container-fluid">
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link add_question" href="#"><i class="fas fa-plus-square"></i> Добавить новый вопрос</a>
+                                </li>
+                                <li class="nav-item">
+                                    {#                                    <a class="nav-link" href="#"><i class="fas fa-file-import"></i> Импорт вопросов из другого теста</a>#}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            <br>
+
+
+            {#Вопросы и ответы#}
+
+
+            <div id="questions_div">
+                {% for question in test_obj.question_set.all %}
+                    <div class="row">
+                        <div class="col-xl-11">
+                            <div class="card shadow bg-white rounded" style="width: 100%;">
+                                <div class="card-body">
+                                    {#                                    <div class="row">#}
+                                    {#                                        <div class="col-sm-6">#}
+                                    {#                                            <a class="delete_question_button btn btn-link" style="text-decoration: none;"><i class="fas fa-trash-alt"></i> Удалить вопрос</a>#}
+                                    {#                                        </div>#}
+                                    {#                                    </div><br>#}
+                                    <div class="row">
+                                        <div class="col-sm-10 question_text_input_div">
+                                            <input type="text" class="form-control-s question_text_input" value="{{ question.question }}" required>
+                                        </div>
+                                        <div class="col-sm-2 change_answer_type_select_div">
+                                            <select class="form-select change_answer_type_select">
+                                                {% if question.has_multiple_choice %}
+                                                    <option value="1"> Один ответ</option>
+                                                    <option value="2" selected> Несколько ответов</option>
+                                                {% else %}
+                                                    <option value="1" selected> Один ответ</option>
+                                                    <option value="2"> Несколько ответов</option>
+                                                {% endif %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <br><br>
+                                    <div class="answers_div">
+                                        <table class="table table-borderless table-hover table-sm answer_table">
+                                            {% autoescape off %}
+                                                <tbody>
+                                                {% for answer in question.answer_set.all %}
+                                                    {% include 'testing/test_for_subject/answer/answer_td.html' %}
+                                                {% endfor %}
+                                                </tbody>
+                                            {% endautoescape %}
+                                        </table>
+                                        <br>
+                                        <small><a class="add_answer btn btn-link btn-sm" style="text-decoration: none;"><i class="fas fa-plus-square"></i> Добавить ответ</a></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-1 d-flex align-items-center div-menu">
+                            {#                            <div class="d-flex justify-content-center align-items-center flex-column">#}
+                            {#                                <a href="" class="btn btn-light" title="Добавить новый вопрос"><i class="fas fa-plus-square fa-lg"></i></a><br>#}
+                            {#                                <a href="" class="btn btn-light" title="Удалить вопрос"><i class="fas fa-trash-alt fa-lg"></i></a>#}
+                            {#                            </div>#}
+                        </div>
+                    </div>
+                    <br>
+                {% endfor %}
+            </div>
+            <button type="button" class="btn btn-primary" id="testing_submit_button">Сохранить</button>
+        </form>
+        <br>
+    </div>
+    <div id="id_bottom"></div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'testing/js/testing_submit_form.js' %}"></script>
+    <script src="{% static 'testing/js/user_interaction.js' %}"></script>
+{% endblock %}

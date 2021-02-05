@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'testing/css/main.css' %}">
+{% endblock %}
+{% block title %}Мои тесты{% endblock %}
+{% block content %}
+
+    <div class="container"><br>
+        <div class="d-flex justify-content-end">
+            <a class="btn btn-light" onclick="window.open('{% url 'testing:test_add' subject.id %}','popup','width=700,height=500'); return false;"><i class="fas fa-plus-circle"></i> Добавить новый тест</a>
+        </div>
+        <br>
+        {% if test_list %}
+            <table class="table table-borderless table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Название теста</th>
+                    <th scope="col">Описание теста</th>
+                    <th scope="col">Время создания теста</th>
+                    <th scope="col">Кто создал тест</th>
+                    <th scope="col">Количество вопросов</th>
+                    {% if request.user.is_superuser %}
+                        <th scope="col">Время последнего редактирования</th>
+                        <th scope="col"></th>
+                    {% endif %}
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for test in test_list %}
+                    <tr>
+                        <td><a href="{% url 'testing:test_update' subject.id test.id %}" style="text-decoration: none;">{{ test.test_name|default_if_none:"Нет данных" }}</a></td>
+                        <td>{{ test.description|default_if_none:"Нет данных" }}</td>
+                        <td><i class="far fa-calendar-alt"></i> {{ test.date_added.date|default_if_none:"Нет данных" }} <i class="far fa-clock"></i> {{ test.date_added.time|default_if_none:"Нет данных" }}</td>
+                        <td>{{ test.who_created.last_name|default:"Нет данных" }}</td>
+                        <td>{{ test.question_set.all.count }}</td>
+                        {% if request.user.is_superuser %}
+                            <td>{{ test.date_last_editing }}</td>
+                            <td><a href="{% url 'testing:test_download' subject.id test.id %}" class="btn btn-light" download><i class="fas fa-download"></i></a></td>
+                        {% endif %}
+                        <td><a href="{% url 'testing:test_delete' test.id %}" class="btn btn-light"><i class="far fa-trash-alt"></i></a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div style="width: 100%;">
+                <div class="card-body">
+                    <h5 class="card-title">По данному предмету нет тестов</h5>
+                    <a href="{% url 'testing:subject_list' %}" class="card-link">Вернуться к списку предметов</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block js %}{% endblock %}

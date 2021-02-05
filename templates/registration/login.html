@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Вход в систему{% endblock %}
+{% block content %}
+    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="login-form">
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <strong>Логин либо пароль введены неверно! Попробуйте еще раз!</strong>
+                </div>
+            {% endif %}
+            {% if user.is_authenticated %}
+                <div class="alert alert-danger">
+                    <strong>У Вас нет прав на просмотр данной страницы! Чтобы продолжить войдите под учетной записью пользователя с соответствующими правами!</strong>
+                </div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label>Логин</label>
+                    <input type="text" class="form-control" name="username" id="username" placeholder="Введите логин">
+                </div>
+                <div class="mb-3">
+                    <label>Пароль</label>
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Введите пароль">
+                </div>
+                <button type="submit" class="btn btn-secondary">Войти!</button>
+            </form>
+            <br>
+{#            <a href="{% url 'profile:profile_registration' %}" class="card-link"><i class="fas fa-user-plus"></i> Еще нет аккаунта? Регистрируйся сейчас!</a>#}
+
+        </div>
+
+    </div>
+{% endblock %}
